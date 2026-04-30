@@ -1,0 +1,24 @@
+{
+  "name": "tetedeflorette",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TêteDeFlorette - memos calendaires avec Vue, Netlify Functions et Neon PostgreSQL.",
+  "scripts": {
+    "dev": "node scripts/dev.cjs",
+    "dev:api": "node dev-api/server.cjs",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:netlify": "node scripts/netlify-dev.cjs",
+    "build": "npm --prefix frontend run build",
+    "preview": "npm --prefix frontend run preview",
+    "check": "npm --prefix frontend run build"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.1",
+    "pg": "^8.20.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^19.1.0"
+  }
+}
