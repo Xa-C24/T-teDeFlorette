@@ -1,0 +1,17 @@
+{
+  "name": "TeteDeFlorette",
+  "short_name": "TeteDeFlo",
+  "description": "Memos calendaires doux et elegants.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff7ea",
+  "theme_color": "#f8e7b8",
+  "icons": [
+    {
+      "src": "/Logotetedeflo.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

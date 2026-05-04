@@ -16,7 +16,7 @@ export const themes = [
     memoHint:
       "Note la séance, carottes à volonté.",
     emptyMessage:
-      "Aucune note pour cette date. La selle est prête, allons-y !.",
+      "Aucune note pour cette date. La selle est prête, allons-y !",
     placeholderLines: [
       "Cours avec Angelo à 14h",
       "Jujux ce week-end ! (Carottes ++)",
@@ -52,7 +52,7 @@ export const themes = [
     eyebrow: "Mode mini pieuvre",
     calendarTitle: "Un planning qui bronze et chauffe au soleil",
     calendarCopy:
-      "Serviette bien posée: crème solaire, maillot ajuster",
+      "Serviette bien posée: un Cosmos, crème solaire, maillot ajuster",
     heroNote: "Programme idéal: sangria, sangria et hierbas, ah et sangria aussi.",
     memoHint:
       "Tu peux y noter l'heure de la marée, une idée de pique-nique avec Orion.",

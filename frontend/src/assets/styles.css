@@ -1,7 +1,7 @@
 :root {
-  --font-display: "Cooper Black", "Comic Sans MS", "Trebuchet MS", cursive;
-  --font-body: "Trebuchet MS", "Aptos", "Segoe UI", sans-serif;
-  --font-accent: "Book Antiqua", "Georgia", "Palatino Linotype", serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Baskerville Old Face", Georgia, serif;
+  --font-body: "Aptos", "Segoe UI", "Trebuchet MS", sans-serif;
+  --font-accent: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
   --bg-main: linear-gradient(180deg, #fff3f7 0%, #ffdfe9 100%);
   --bg-overlay-a: rgba(255, 255, 255, 0.7);
   --bg-overlay-b: rgba(255, 182, 208, 0.22);
@@ -28,9 +28,9 @@
 }
 
 :root[data-theme="girly-rose"] {
-  --font-display: "Cooper Black", "Comic Sans MS", "Trebuchet MS", cursive;
-  --font-body: "Trebuchet MS", "Aptos", "Segoe UI", sans-serif;
-  --font-accent: "Book Antiqua", "Georgia", "Palatino Linotype", serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Baskerville Old Face", Georgia, serif;
+  --font-body: "Aptos", "Segoe UI", "Trebuchet MS", sans-serif;
+  --font-accent: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
   --bg-main: linear-gradient(180deg, #fff2f7 0%, #ffd7e7 52%, #ffe8f1 100%);
   --bg-overlay-a: rgba(255, 255, 255, 0.7);
   --bg-overlay-b: rgba(255, 177, 208, 0.3);
@@ -51,9 +51,9 @@
 }
 
 :root[data-theme="equitation"] {
-  --font-display: "Cooper Black", "Rockwell", "Trebuchet MS", serif;
-  --font-body: "Trebuchet MS", "Segoe UI", sans-serif;
-  --font-accent: "Book Antiqua", "Palatino Linotype", serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Baskerville Old Face", Georgia, serif;
+  --font-body: "Aptos", "Segoe UI", "Trebuchet MS", sans-serif;
+  --font-accent: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
   --bg-main: linear-gradient(180deg, #f5efcf 0%, #d7e1b8 42%, #f3ebc9 100%);
   --bg-overlay-a: rgba(255, 249, 230, 0.4);
   --bg-overlay-b: rgba(153, 178, 100, 0.24);
@@ -74,9 +74,9 @@
 }
 
 :root[data-theme="montagne"] {
-  --font-display: "Cooper Black", "Gill Sans", "Trebuchet MS", sans-serif;
-  --font-body: "Trebuchet MS", "Aptos", "Segoe UI", sans-serif;
-  --font-accent: "Book Antiqua", "Palatino Linotype", serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Baskerville Old Face", Georgia, serif;
+  --font-body: "Aptos", "Segoe UI", "Trebuchet MS", sans-serif;
+  --font-accent: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
   --bg-main: linear-gradient(180deg, #edf5f7 0%, #d5e0e8 54%, #eef3f2 100%);
   --bg-overlay-a: rgba(255, 255, 255, 0.52);
   --bg-overlay-b: rgba(120, 152, 165, 0.24);
@@ -97,9 +97,9 @@
 }
 
 :root[data-theme="plage"] {
-  --font-display: "Cooper Black", "Verdana", "Trebuchet MS", sans-serif;
-  --font-body: "Trebuchet MS", "Aptos", "Segoe UI", sans-serif;
-  --font-accent: "Book Antiqua", "Georgia", "Palatino Linotype", serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Baskerville Old Face", Georgia, serif;
+  --font-body: "Aptos", "Segoe UI", "Trebuchet MS", sans-serif;
+  --font-accent: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
   --bg-main: linear-gradient(180deg, #fef6df 0%, #ffd99f 45%, #bfe8f6 100%);
   --bg-overlay-a: rgba(255, 255, 255, 0.56);
   --bg-overlay-b: rgba(255, 204, 123, 0.22);
@@ -120,9 +120,9 @@
 }
 
 :root[data-theme="place-doree"] {
-  --font-display: "Cooper Black", "Book Antiqua", "Palatino Linotype", serif;
-  --font-body: "Candara", "Trebuchet MS", "Segoe UI", sans-serif;
-  --font-accent: "Book Antiqua", "Georgia", "Palatino Linotype", serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Baskerville Old Face", Georgia, serif;
+  --font-body: "Aptos", "Candara", "Segoe UI", "Trebuchet MS", sans-serif;
+  --font-accent: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
   --bg-main: linear-gradient(180deg, #f6e7cf 0%, #eec993 50%, #f8eedb 100%);
   --bg-overlay-a: rgba(255, 250, 242, 0.56);
   --bg-overlay-b: rgba(206, 149, 73, 0.22);
@@ -290,6 +290,7 @@ button {
   align-items: flex-start;
   gap: 14px;
   width: 100%;
+  flex-wrap: wrap;
   justify-content: flex-end;
 }
 
@@ -390,10 +391,16 @@ button {
   min-width: 0;
 }
 
-.collapsible-toggle__text strong {
+.collapsible-toggle__headline {
+  font-family: var(--font-display);
+}
+
+.collapsible-toggle__title {
   font-family: var(--font-display);
   font-size: clamp(1.25rem, 2vw, 2rem);
+  font-weight: 500;
   line-height: 1.1;
+  letter-spacing: 0.01em;
 }
 
 .collapsible-toggle__icon {
@@ -442,6 +449,12 @@ button {
   margin-bottom: 0;
 }
 
+:root[data-theme="plage"] .panel__hero .collapsible-toggle__headline {
+  font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
 .theme-picker {
   display: grid;
   gap: 8px;
@@ -479,7 +492,7 @@ button {
   color: #f6f8fc;
   font-family: var(--font-body);
   font-size: 1.05rem;
-  font-weight: 600;
+  font-weight: 500;
   box-shadow:
     inset 0 0 0 1px rgba(157, 191, 241, 0.18),
     0 16px 30px rgba(16, 22, 35, 0.18);
@@ -562,6 +575,12 @@ button {
   overflow-wrap: anywhere;
 }
 
+.theme-switcher__headline {
+  font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
 .theme-switcher__grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -582,6 +601,8 @@ button {
 .theme-card strong {
   font-family: var(--font-display);
   font-size: 1.08rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 .theme-card span:last-child {
@@ -606,9 +627,11 @@ button {
   box-shadow: var(--shadow);
 }
 
-.theme-pulse strong {
+.theme-pulse__name {
   font-family: var(--font-display);
   font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 .panel__hero {
@@ -631,6 +654,8 @@ button {
 .memo-card__header h2 {
   font-family: var(--font-display);
   font-size: clamp(1.7rem, 2vw, 2.5rem);
+  font-weight: 500;
+  letter-spacing: 0.005em;
   margin-bottom: 10px;
 }
 
@@ -693,6 +718,7 @@ button {
 .calendar-toolbar h3 {
   font-family: var(--font-display);
   font-size: clamp(1.35rem, 1.8vw, 1.9rem);
+  font-weight: 500;
   text-align: center;
 }
 
@@ -782,8 +808,12 @@ button {
   position: absolute;
   left: 16px;
   bottom: 14px;
+  max-width: calc(100% - 30px);
   font-size: 0.8rem;
+  line-height: 1.15;
   color: var(--text-soft);
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .memo-card {
@@ -935,6 +965,10 @@ button {
     min-width: 100%;
   }
 
+  .theme-switcher__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .calendar-shortcuts {
     width: 100%;
   }
@@ -978,12 +1012,16 @@ button {
 
   .shell__topbar {
     justify-content: flex-start;
+    gap: 10px;
   }
 
   .ghost-link {
-    align-self: flex-start;
+    flex: 1 1 calc(50% - 5px);
+    min-width: 0;
+    align-self: stretch;
     padding: 12px 18px;
     font-size: 0.98rem;
+    text-align: center;
   }
 
   .calendar-shortcuts .icon-button {
@@ -1020,6 +1058,15 @@ button {
     right: 0;
   }
 
+  .collapsible-toggle--card {
+    align-items: flex-start;
+  }
+
+  .collapsible-toggle--card .collapsible-toggle__text {
+    display: grid;
+    gap: 8px;
+  }
+
   .theme-switcher__intro h2,
   .panel__hero h2,
   .memo-card__header h2 {
@@ -1046,6 +1093,7 @@ button {
 
   .day-card {
     min-height: 78px;
+    padding: 10px;
   }
 
   .day-card__memo {
@@ -1085,6 +1133,10 @@ button {
     padding: 11px 12px;
   }
 
+  .theme-switcher__grid {
+    grid-template-columns: 1fr;
+  }
+
   .theme-switcher__intro h2 {
     font-size: 1.7rem;
     line-height: 1.08;
@@ -1094,5 +1146,40 @@ button {
   .shell__tagline,
   .theme-pulse span {
     font-size: 0.98rem;
+  }
+
+  .ghost-link {
+    flex-basis: 100%;
+  }
+
+  .calendar-card {
+    overflow-x: auto;
+  }
+
+  .calendar-grid,
+  .calendar-grid--header {
+    min-width: 392px;
+  }
+
+  .weekday {
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+  }
+
+  .day-card {
+    min-height: 72px;
+    padding: 8px;
+  }
+
+  .day-card__number {
+    font-size: 1rem;
+  }
+
+  .day-card__memo {
+    left: 8px;
+    bottom: 8px;
+    font-size: 0.66rem;
+    max-width: calc(100% - 18px);
+    line-height: 1.05;
   }
 }

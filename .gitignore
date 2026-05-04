@@ -2,6 +2,7 @@ node_modules/
 frontend/node_modules/
 frontend/dist/
 .netlify/
+.netlify-local/
 .env
 .env.local
 frontend/.env

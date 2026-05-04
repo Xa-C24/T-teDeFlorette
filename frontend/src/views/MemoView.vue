@@ -44,7 +44,9 @@ async function loadMemo() {
   }
 }
 
-async function persistMemo() {
+async function persistMemo(options = {}) {
+  const { returnToCalendar = false } = options;
+
   if (saving.value) {
     return;
   }
@@ -62,7 +64,19 @@ async function persistMemo() {
       });
     }
 
-    saveMessage.value = "Memo enregistre";
+    saveMessage.value = "Memo enregistre avec succes Florette !";
+
+    if (returnToCalendar) {
+      await router.push({
+        name: "calendar",
+        query: {
+          focusDate: props.date,
+          open: "1",
+        },
+      });
+      return;
+    }
+
     window.clearTimeout(saveFeedbackTimer);
     saveFeedbackTimer = window.setTimeout(() => {
       saveMessage.value = "";
@@ -133,30 +147,35 @@ onBeforeUnmount(() => {
       <div v-if="isMemoOpen" class="collapsible-body">
         <p class="hero-note">{{ currentTheme.heroNote }}</p>
         <p v-if="loading" class="status">Chargement du memo...</p>
-      <template v-else>
-        <p class="hint">
-          {{ currentTheme.memoHint }}
-        </p>
+        <template v-else>
+          <p class="hint">
+            {{ currentTheme.memoHint }}
+          </p>
 
-        <textarea
-          v-model="content"
-          class="memo-textarea"
-          :placeholder="placeholderText"
-          rows="14"
-        />
+          <textarea
+            v-model="content"
+            class="memo-textarea"
+            :placeholder="placeholderText"
+            rows="14"
+          />
 
-        <p v-if="!content.trim()" class="empty-state">
-          {{ currentTheme.emptyMessage }}
-        </p>
+          <p v-if="!content.trim()" class="empty-state">
+            {{ currentTheme.emptyMessage }}
+          </p>
 
-        <div class="memo-actions">
-          <button class="primary-button" type="button" :disabled="saving" @click="persistMemo">
-            {{ saving ? "Enregistrement..." : "Valider la journée de Florette" }}
-          </button>
-          <span v-if="saveMessage" class="status status--success">{{ saveMessage }}</span>
-          <span v-if="errorMessage" class="status status--error">{{ errorMessage }}</span>
-        </div>
-      </template>
+          <div class="memo-actions">
+            <button
+              class="primary-button"
+              type="button"
+              :disabled="saving"
+              @click="persistMemo({ returnToCalendar: true })"
+            >
+              {{ saving ? "Enregistrement..." : "Valider la journée de Florette" }}
+            </button>
+            <span v-if="saveMessage" class="status status--success">{{ saveMessage }}</span>
+            <span v-if="errorMessage" class="status status--error">{{ errorMessage }}</span>
+          </div>
+        </template>
       </div>
     </div>
   </section>

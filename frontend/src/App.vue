@@ -1,11 +1,12 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { RouterView, useRouter } from "vue-router";
+import { RouterView, useRoute, useRouter } from "vue-router";
 import { applyTheme, currentTheme, currentThemeKey, setTheme, themes } from "./theme";
 import { formatKey } from "./utils/date";
 
 const isThemeMenuOpen = ref(false);
 const isThemeSwitcherOpen = ref(false);
+const route = useRoute();
 const router = useRouter();
 
 function toggleThemeMenu() {
@@ -22,16 +23,30 @@ function chooseTheme(themeKey) {
   isThemeMenuOpen.value = false;
 }
 
+async function openCalendarAt(dateKey) {
+  await router.push({
+    name: "calendar",
+    query: {
+      focusDate: dateKey,
+      open: "1",
+    },
+  });
+}
+
 async function openCalendar() {
-  await router.push({ name: "calendar" });
+  const todayKey = formatKey(new Date());
+
+  await openCalendarAt(todayKey);
   window.dispatchEvent(new CustomEvent("calendar:open-current-month"));
 }
 
 async function openTodayMemo() {
-  await router.push({ name: "calendar" });
+  const todayKey = formatKey(new Date());
+
+  await openCalendarAt(todayKey);
   window.dispatchEvent(
     new CustomEvent("calendar:open-date", {
-      detail: { dateKey: formatKey(new Date()) },
+      detail: { dateKey: todayKey },
     })
   );
 }
@@ -39,10 +54,12 @@ async function openTodayMemo() {
 async function openTomorrowMemo() {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  await router.push({ name: "calendar" });
+  const tomorrowKey = formatKey(tomorrow);
+
+  await openCalendarAt(tomorrowKey);
   window.dispatchEvent(
     new CustomEvent("calendar:open-date", {
-      detail: { dateKey: formatKey(tomorrow) },
+      detail: { dateKey: tomorrowKey },
     })
   );
 }
@@ -57,6 +74,13 @@ onMounted(() => {
   applyTheme();
   window.addEventListener("click", handleWindowClick);
 });
+
+watch(
+  () => route.name,
+  () => {
+    isThemeMenuOpen.value = false;
+  }
+);
 
 watch(currentThemeKey, (themeKey) => {
   applyTheme(themeKey);
@@ -88,7 +112,7 @@ onBeforeUnmount(() => {
         </div>
         <div class="theme-pulse">
           <span class="theme-pulse__label">Ambiance active</span>
-          <strong>{{ currentTheme.name }}</strong>
+          <span class="theme-pulse__name">{{ currentTheme.name }}</span>
           <span>{{ currentTheme.label }}</span>
         </div>
       </div>
@@ -103,7 +127,7 @@ onBeforeUnmount(() => {
       >
         <span class="collapsible-toggle__text">
           <span class="eyebrow">Vestiaire visuel</span>
-          <strong>Changer d'ambiance</strong>
+          <span class="collapsible-toggle__title">Changer d'ambiance</span>
         </span>
         <span
           class="collapsible-toggle__icon"
@@ -146,7 +170,7 @@ onBeforeUnmount(() => {
       </div>
 
       <div class="theme-switcher__intro">
-        <h2>Cinq humeurs, cinq décors au gré des humeurs, même agenda</h2>
+        <h2 class="theme-switcher__headline">Cinq humeurs, cinq décors au gré des humeurs, même agenda</h2>
         <p class="hero-copy">
           {{ currentTheme.label }}
         </p>

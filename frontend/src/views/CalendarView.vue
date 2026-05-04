@@ -1,10 +1,11 @@
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { getMemos } from "../services/api";
 import { currentTheme } from "../theme";
 import { buildCalendarDays, formatKey, getMonthLabel } from "../utils/date";
 
+const route = useRoute();
 const router = useRouter();
 const todayKey = formatKey(new Date());
 const currentMonth = ref(new Date());
@@ -96,6 +97,34 @@ async function openDateFromEvent(event) {
   });
 }
 
+async function syncCalendarFromRoute() {
+  const focusDate = typeof route.query.focusDate === "string" ? route.query.focusDate : "";
+  const shouldOpen = route.query.open === "1";
+
+  if (!focusDate) {
+    return;
+  }
+
+  const date = new Date(`${focusDate}T12:00:00`);
+
+  if (Number.isNaN(date.getTime())) {
+    return;
+  }
+
+  jumpToDate(date);
+
+  if (!shouldOpen) {
+    return;
+  }
+
+  isCalendarOpen.value = true;
+  await nextTick();
+  calendarCardRef.value?.scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+  });
+}
+
 function openShortcutDate(date) {
   jumpToDate(date);
   openMemo(formatKey(date));
@@ -125,6 +154,14 @@ onMounted(() => {
   window.addEventListener("calendar:open-date", openDateFromEvent);
 });
 
+watch(
+  () => [route.query.focusDate, route.query.open],
+  () => {
+    syncCalendarFromRoute();
+  },
+  { immediate: true }
+);
+
 onBeforeUnmount(() => {
   window.removeEventListener("calendar:open-current-month", openCurrentMonth);
   window.removeEventListener("calendar:open-date", openDateFromEvent);
@@ -142,7 +179,7 @@ onBeforeUnmount(() => {
       >
         <span class="collapsible-toggle__text">
           <span class="eyebrow">Vue mensuelle</span>
-          <strong>{{ currentTheme.calendarTitle }}</strong>
+          <strong class="collapsible-toggle__headline">{{ currentTheme.calendarTitle }}</strong>
         </span>
         <span
           class="collapsible-toggle__icon"
@@ -217,7 +254,7 @@ onBeforeUnmount(() => {
           >
             <span class="day-card__number">{{ day.dayNumber }}</span>
             <span v-if="memoDates.has(day.key)" class="day-card__memo">memo</span>
-            <span v-else-if="day.key === todayKey" class="day-card__memo">aujourd'hui</span>
+            <span v-else-if="day.key === todayKey" class="day-card__memo">To Day</span>
           </button>
         </div>
       </div>
