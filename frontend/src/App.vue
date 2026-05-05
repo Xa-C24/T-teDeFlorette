@@ -29,6 +29,7 @@ async function openCalendarAt(dateKey) {
     query: {
       focusDate: dateKey,
       open: "1",
+      stamp: Date.now().toString(),
     },
   });
 }
@@ -37,18 +38,16 @@ async function openCalendar() {
   const todayKey = formatKey(new Date());
 
   await openCalendarAt(todayKey);
-  window.dispatchEvent(new CustomEvent("calendar:open-current-month"));
 }
 
 async function openTodayMemo() {
   const todayKey = formatKey(new Date());
 
-  await openCalendarAt(todayKey);
-  window.dispatchEvent(
-    new CustomEvent("calendar:open-date", {
-      detail: { dateKey: todayKey },
-    })
-  );
+  await router.push({
+    name: "memo",
+    params: { date: todayKey },
+    query: { open: "1", focus: "1" },
+  });
 }
 
 async function openTomorrowMemo() {
@@ -56,12 +55,11 @@ async function openTomorrowMemo() {
   tomorrow.setDate(tomorrow.getDate() + 1);
   const tomorrowKey = formatKey(tomorrow);
 
-  await openCalendarAt(tomorrowKey);
-  window.dispatchEvent(
-    new CustomEvent("calendar:open-date", {
-      detail: { dateKey: tomorrowKey },
-    })
-  );
+  await router.push({
+    name: "memo",
+    params: { date: tomorrowKey },
+    query: { open: "1", focus: "1" },
+  });
 }
 
 function handleWindowClick(event) {

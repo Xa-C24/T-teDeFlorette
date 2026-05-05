@@ -1,6 +1,6 @@
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { useRouter } from "vue-router";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { deleteMemo, getMemoByDate, saveMemo } from "../services/api";
 import { currentTheme } from "../theme";
 import { formatDisplayDate } from "../utils/date";
@@ -12,6 +12,7 @@ const props = defineProps({
   },
 });
 
+const route = useRoute();
 const router = useRouter();
 const content = ref("");
 const loading = ref(true);
@@ -19,6 +20,7 @@ const saving = ref(false);
 const saveMessage = ref("");
 const errorMessage = ref("");
 const isMemoOpen = ref(false);
+const memoTextareaRef = ref(null);
 let autoSaveDebounceTimer = null;
 let saveFeedbackTimer = null;
 
@@ -41,6 +43,28 @@ async function loadMemo() {
     errorMessage.value = error.message;
   } finally {
     loading.value = false;
+  }
+}
+
+async function syncOpenStateFromRoute() {
+  const shouldOpen = route.query.open === "1";
+  const shouldFocus = route.query.focus === "1";
+
+  if (!shouldOpen) {
+    return;
+  }
+
+  isMemoOpen.value = true;
+  await nextTick();
+
+  if (shouldFocus && memoTextareaRef.value) {
+    memoTextareaRef.value.focus();
+    const length = memoTextareaRef.value.value.length;
+    memoTextareaRef.value.setSelectionRange(length, length);
+    memoTextareaRef.value.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
   }
 }
 
@@ -108,6 +132,15 @@ function goBack() {
 
 watch(() => props.date, loadMemo);
 watch(content, queueAutoSave);
+watch(
+  () => [route.query.open, route.query.focus, props.date, loading.value],
+  () => {
+    if (!loading.value) {
+      syncOpenStateFromRoute();
+    }
+  },
+  { immediate: true }
+);
 
 onMounted(loadMemo);
 
@@ -153,6 +186,7 @@ onBeforeUnmount(() => {
           </p>
 
           <textarea
+            ref="memoTextareaRef"
             v-model="content"
             class="memo-textarea"
             :placeholder="placeholderText"

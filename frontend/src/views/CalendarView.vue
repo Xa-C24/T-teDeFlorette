@@ -59,27 +59,6 @@ function jumpToDate(date) {
   focusedDateKey.value = formatKey(date);
 }
 
-function goToToday() {
-  currentMonth.value = new Date();
-  focusedDateKey.value = todayKey;
-}
-
-function goToTomorrow() {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  jumpToDate(tomorrow);
-}
-
-async function openCurrentMonth() {
-  goToToday();
-  isCalendarOpen.value = true;
-  await nextTick();
-  calendarCardRef.value?.scrollIntoView({
-    behavior: "smooth",
-    block: "start",
-  });
-}
-
 async function openDateFromEvent(event) {
   const dateKey = event.detail?.dateKey;
 
@@ -150,12 +129,11 @@ async function loadMemos() {
 
 onMounted(() => {
   loadMemos();
-  window.addEventListener("calendar:open-current-month", openCurrentMonth);
   window.addEventListener("calendar:open-date", openDateFromEvent);
 });
 
 watch(
-  () => [route.query.focusDate, route.query.open],
+  () => [route.query.focusDate, route.query.open, route.query.stamp],
   () => {
     syncCalendarFromRoute();
   },
@@ -163,7 +141,6 @@ watch(
 );
 
 onBeforeUnmount(() => {
-  window.removeEventListener("calendar:open-current-month", openCurrentMonth);
   window.removeEventListener("calendar:open-date", openDateFromEvent);
 });
 </script>
