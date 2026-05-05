@@ -55,11 +55,11 @@ export const themes = [
       "Serviette bien posée: un Cosmos, crème solaire, maillot ajuster",
     heroNote: "Programme idéal: sangria, sangria et hierbas, ah et sangria aussi.",
     memoHint:
-      "Tu peux y noter l'heure de la marée, une idée de pique-nique avec Orion.",
+      "",
     emptyMessage:
       "",
     placeholderLines: [
-      "Creme solaire, , lunettes héroiques",
+      "Crème solaire, lunettes Ray Ban",
       "Con jamon y tomate",
       "Pensez à réserver un resto pour le coucher de soleil ! ",
     ],
