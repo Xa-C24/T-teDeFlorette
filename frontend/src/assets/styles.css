@@ -1043,7 +1043,7 @@ button {
   }
 
    .shell__logo--title {
-    width: min(100%, 280px);
+    width: min(100%, 360px);
     height: auto;
     border-radius: 22px;
   }
@@ -1111,7 +1111,7 @@ button {
   }
 
   .shell__logo--title {
-    width: min(100%, 220px);
+    width: min(100%, 300px);
     height: auto;
     border-radius: 20px;
   }

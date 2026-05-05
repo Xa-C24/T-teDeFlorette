@@ -110,7 +110,11 @@ function openShortcutDate(date) {
 }
 
 function openMemo(dateKey) {
-  router.push({ name: "memo", params: { date: dateKey } });
+  router.push({
+    name: "memo",
+    params: { date: dateKey },
+    query: { open: "1", focus: "1" },
+  });
 }
 
 async function loadMemos() {
