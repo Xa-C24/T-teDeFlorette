@@ -24,14 +24,14 @@ jobs:
       - name: Install frontend dependencies
         run: npm --prefix frontend ci
 
-      - name: Install deployment dependencies
-        run: npm install --no-save netlify-cli@19.1.0 pg@8.20.0 dotenv@16.6.1 cors@2.8.6 express@4.22.1
+      - name: Install function runtime dependencies
+        run: npm install --no-save pg@8.20.0 dotenv@16.6.1 cors@2.8.6 express@4.22.1
 
       - name: Build frontend
         run: npm run build
 
       - name: Deploy site to Netlify
-        run: npx netlify deploy --prod --dir frontend/dist --functions netlify/functions --site "$NETLIFY_SITE_ID" --auth "$NETLIFY_AUTH_TOKEN"
+        run: npx netlify-cli@26.0.0 deploy --prod --dir frontend/dist --functions netlify/functions --site "$NETLIFY_SITE_ID" --auth "$NETLIFY_AUTH_TOKEN"
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
