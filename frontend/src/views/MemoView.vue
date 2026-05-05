@@ -418,7 +418,7 @@ onBeforeUnmount(() => {
             </div>
 
             <p class="empty-state empty-state--soft">
-              Les taches ajoutees montent directement dans le memo du haut.
+              Les tâches ajoutées montent directement dans le mémo du haut.
             </p>
           </div>
 

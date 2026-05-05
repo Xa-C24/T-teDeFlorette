@@ -37,7 +37,7 @@ export const themes = [
     memoHint:
       "Plans de rando, chocolat chaud et terasse au soleil.",
     emptyMessage:
-      "Le refuge est calme.",
+      "Le refuge est calme, RAS aujourd'hui.",
     placeholderLines: [
       "Acheter des mouffles",
       "Commander des pneus hiver",
@@ -57,7 +57,7 @@ export const themes = [
     memoHint:
       "",
     emptyMessage:
-      "",
+      "T'occupes avec tes notes, viens on va bronzer plutôt !",
     placeholderLines: [
       "Crème solaire, lunettes Ray Ban",
       "Con jamon y tomate",
@@ -76,7 +76,7 @@ export const themes = [
     memoHint:
       "",
     emptyMessage:
-      "Cette date attend encore sa scene de place animee, sa fontaine et sa note bien tournee.",
+      "Cette date attend encore que lui passe de la crème sur le dos !",
     placeholderLines: [
      
       "Commander un nouveau maillot de bain ",
