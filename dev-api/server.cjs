@@ -19,6 +19,14 @@ const port = Number(process.env.PORT || 8788);
 app.use(cors());
 app.use(express.json());
 
+const MEMO_SELECT_FIELDS = `
+  id,
+  memo_date::text AS memo_date,
+  content,
+  created_at,
+  updated_at
+`;
+
 function normalizeMemo(row) {
   return {
     id: row.id,
@@ -51,7 +59,7 @@ app.get("/api/memos", async (_req, res) => {
   try {
     await ensureDatabase();
     const result = await pool.query(
-      "SELECT id, memo_date, content, created_at, updated_at FROM memos ORDER BY memo_date ASC"
+      `SELECT ${MEMO_SELECT_FIELDS} FROM memos ORDER BY memo_date ASC`
     );
 
     res.json({
@@ -78,7 +86,7 @@ app.get("/api/memos/:date", async (req, res) => {
     }
 
     const result = await pool.query(
-      "SELECT id, memo_date, content, created_at, updated_at FROM memos WHERE memo_date = $1",
+      `SELECT ${MEMO_SELECT_FIELDS} FROM memos WHERE memo_date = $1`,
       [date]
     );
 
@@ -111,7 +119,7 @@ app.post("/api/memos", async (req, res) => {
        VALUES ($1, $2)
        ON CONFLICT (memo_date)
        DO UPDATE SET content = EXCLUDED.content, updated_at = CURRENT_TIMESTAMP
-       RETURNING id, memo_date, content, created_at, updated_at`,
+       RETURNING ${MEMO_SELECT_FIELDS}`,
       [memoDate, content]
     );
 

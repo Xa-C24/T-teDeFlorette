@@ -7,6 +7,14 @@ function extractDateFromPath(path = "") {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
+const MEMO_SELECT_FIELDS = `
+  id,
+  memo_date::text AS memo_date,
+  content,
+  created_at,
+  updated_at
+`;
+
 function normalizeMemo(row) {
   return {
     id: row.id,
@@ -26,7 +34,7 @@ exports.handler = async function handler(event) {
 
       if (!date) {
         const result = await pool.query(
-          "SELECT id, memo_date, content, created_at, updated_at FROM memos ORDER BY memo_date ASC"
+          `SELECT ${MEMO_SELECT_FIELDS} FROM memos ORDER BY memo_date ASC`
         );
 
         return json(200, {
@@ -41,7 +49,7 @@ exports.handler = async function handler(event) {
       }
 
       const result = await pool.query(
-        "SELECT id, memo_date, content, created_at, updated_at FROM memos WHERE memo_date = $1",
+        `SELECT ${MEMO_SELECT_FIELDS} FROM memos WHERE memo_date = $1`,
         [date]
       );
 
@@ -72,7 +80,7 @@ exports.handler = async function handler(event) {
          VALUES ($1, $2)
          ON CONFLICT (memo_date)
          DO UPDATE SET content = EXCLUDED.content, updated_at = CURRENT_TIMESTAMP
-         RETURNING id, memo_date, content, created_at, updated_at`,
+         RETURNING ${MEMO_SELECT_FIELDS}`,
         [memoDate, content]
       );
 

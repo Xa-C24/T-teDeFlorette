@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import { getMemos } from "../services/api";
 import { currentTheme } from "../theme";
 import { buildCalendarDays, formatKey, getMonthLabel } from "../utils/date";
+import { hasStoredMemoContent } from "../utils/memo";
 
 const route = useRoute();
 const router = useRouter();
@@ -117,13 +118,21 @@ function openMemo(dateKey) {
   });
 }
 
+function dayHasMemo(dateKey) {
+  return memoDates.value.has(dateKey);
+}
+
 async function loadMemos() {
   loading.value = true;
   errorMessage.value = "";
 
   try {
     const response = await getMemos();
-    memoDates.value = new Set(response.items.map((item) => item.memoDate));
+    memoDates.value = new Set(
+      response.items
+        .filter((item) => hasStoredMemoContent(item.content))
+        .map((item) => item.memoDate)
+    );
   } catch (error) {
     errorMessage.value = error.message;
   } finally {
@@ -140,6 +149,7 @@ watch(
   () => [route.query.focusDate, route.query.open, route.query.stamp],
   () => {
     syncCalendarFromRoute();
+    loadMemos();
   },
   { immediate: true }
 );
@@ -204,7 +214,7 @@ onBeforeUnmount(() => {
       <div v-if="isCalendarOpen" class="collapsible-body">
         <div class="calendar-toolbar">
           <button class="icon-button" type="button" @click="goToPreviousMonth">
-            Mois precedent
+            Mois précédent
           </button>
           <h3>{{ monthLabel }}</h3>
           <button class="icon-button" type="button" @click="goToNextMonth">
@@ -227,14 +237,15 @@ onBeforeUnmount(() => {
             :class="{
               'day-card--muted': !day.isCurrentMonth,
               'day-card--today': day.key === todayKey,
-              'day-card--memo': memoDates.has(day.key),
+              'day-card--memo': dayHasMemo(day.key),
+              'day-card--has-memo': dayHasMemo(day.key),
               'day-card--focused': day.key === focusedDateKey,
             }"
             type="button"
             @click="openMemo(day.key)"
           >
             <span class="day-card__number">{{ day.dayNumber }}</span>
-            <span v-if="memoDates.has(day.key)" class="day-card__memo">memo</span>
+            <span v-if="dayHasMemo(day.key)" class="day-card__memo"></span>
             <span v-else-if="day.key === todayKey" class="day-card__memo">To Day</span>
           </button>
         </div>

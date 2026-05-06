@@ -4,8 +4,12 @@ import { useRoute, useRouter } from "vue-router";
 import { deleteMemo, getMemoByDate, saveMemo } from "../services/api";
 import { currentTheme } from "../theme";
 import { formatDisplayDate } from "../utils/date";
-
-const MEMO_V2_PREFIX = "[[TDF_MEMO_V2]]";
+import {
+  hasMemoTasks,
+  hasMemoText,
+  MEMO_V2_PREFIX,
+  parseStoredMemoContent,
+} from "../utils/memo";
 const IMPORTANCE_OPTIONS = [
   { value: "+", label: "+" },
   { value: "++", label: "++" },
@@ -42,9 +46,7 @@ const displayDate = computed(() => {
 const placeholderText = computed(() => currentTheme.value.placeholderLines.join("\n"));
 
 const hasMemoContent = computed(
-  () =>
-    freeformNotes.value.trim().length > 0 ||
-    tasks.value.some((task) => task.label.trim().length > 0)
+  () => hasMemoText(freeformNotes.value) || hasMemoTasks(tasks.value)
 );
 
 const memoTasks = computed(() =>
@@ -84,30 +86,6 @@ function normalizeTask(task) {
   };
 }
 
-function parseMemoContent(rawContent) {
-  const source = typeof rawContent === "string" ? rawContent : "";
-
-  if (!source.startsWith(MEMO_V2_PREFIX)) {
-    return {
-      notes: source,
-      tasks: [],
-    };
-  }
-
-  try {
-    const payload = JSON.parse(source.slice(MEMO_V2_PREFIX.length));
-    return {
-      notes: typeof payload.notes === "string" ? payload.notes : "",
-      tasks: Array.isArray(payload.tasks) ? payload.tasks.map(normalizeTask) : [],
-    };
-  } catch {
-    return {
-      notes: source,
-      tasks: [],
-    };
-  }
-}
-
 function serializeMemoContent() {
   const notes = freeformNotes.value.replace(/\r\n/g, "\n");
   const normalizedTasks = tasks.value
@@ -135,9 +113,9 @@ async function loadMemo() {
 
   try {
     const response = await getMemoByDate(props.date);
-    const parsedMemo = parseMemoContent(response.item?.content || "");
+    const parsedMemo = parseStoredMemoContent(response.item?.content || "");
     freeformNotes.value = parsedMemo.notes;
-    tasks.value = parsedMemo.tasks;
+    tasks.value = parsedMemo.tasks.map(normalizeTask);
     newTaskLabel.value = "";
     newTaskImportance.value = "+";
   } catch (error) {
@@ -189,7 +167,7 @@ async function persistMemo(options = {}) {
       });
     }
 
-    saveMessage.value = "Memo enregistre avec succes Florette !";
+    saveMessage.value = "Memo enregistré avec succes Florette !";
 
     if (returnToCalendar) {
       await router.push({
@@ -197,6 +175,7 @@ async function persistMemo(options = {}) {
         query: {
           focusDate: props.date,
           open: "1",
+          stamp: Date.now().toString(),
         },
       });
       return;
@@ -276,7 +255,14 @@ function removeTask(taskId) {
 }
 
 function goBack() {
-  router.push({ name: "calendar" });
+  router.push({
+    name: "calendar",
+    query: {
+      focusDate: props.date,
+      open: "1",
+      stamp: Date.now().toString(),
+    },
+  });
 }
 
 watch(() => props.date, loadMemo);

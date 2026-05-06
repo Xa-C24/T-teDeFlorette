@@ -785,6 +785,24 @@ button {
   background: var(--day-today);
 }
 
+.day-card--has-memo {
+  border-color: color-mix(in srgb, var(--accent) 20%, rgba(255, 255, 255, 0.72));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, rgba(255, 255, 255, 0.82) 78%, var(--accent-soft)),
+    color-mix(in srgb, var(--surface-3) 82%, var(--accent-soft))
+  );
+}
+
+.day-card--today.day-card--has-memo {
+  border-color: color-mix(in srgb, var(--accent-strong) 40%, var(--accent));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--day-today) 86%, rgba(255, 255, 255, 0.92)),
+    color-mix(in srgb, var(--day-today) 72%, var(--accent-soft))
+  );
+}
+
 .day-card--memo::after {
   content: "";
   position: absolute;
