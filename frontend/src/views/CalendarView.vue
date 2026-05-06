@@ -36,7 +36,7 @@ const spotlightLabel = computed(() => {
     return "";
   }
 
-  return `${memoDates.value.size} memos galopent deja dans la base. L'agenda ne dort pas.`;
+  return `${memoDates.value.size} memos galopent déjà dans la base. L'agenda ne dort pas.`;
 });
 
 const spotlightParts = computed(() =>
