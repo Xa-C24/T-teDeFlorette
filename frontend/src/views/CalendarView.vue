@@ -39,6 +39,14 @@ const spotlightLabel = computed(() => {
   return `${memoDates.value.size} memos galopent deja dans la base. L'agenda ne dort pas.`;
 });
 
+const spotlightParts = computed(() =>
+  spotlightLabel.value
+    .split(". ")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((part, index, parts) => (index < parts.length - 1 && !part.endsWith(".") ? `${part}.` : part))
+);
+
 function goToPreviousMonth() {
   currentMonth.value = new Date(
     currentMonth.value.getFullYear(),
@@ -200,7 +208,15 @@ onBeforeUnmount(() => {
       >
         <span class="collapsible-toggle__text">
           <span class="theme-badge">{{ currentTheme.name }}</span>
-          <span class="calendar-topline__text">{{ spotlightLabel }}</span>
+          <span class="calendar-topline__text">
+            <span
+              v-for="(part, index) in spotlightParts"
+              :key="`${index}-${part}`"
+              class="calendar-topline__part"
+            >
+              {{ part }}
+            </span>
+          </span>
         </span>
         <span
           class="collapsible-toggle__icon"

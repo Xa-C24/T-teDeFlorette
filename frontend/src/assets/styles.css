@@ -265,10 +265,20 @@ button {
 .empty-state,
 .hero-note,
 .theme-pulse span,
-.calendar-topline__text {
+.calendar-topline__part {
   margin: 0;
   color: var(--text-soft);
   line-height: 1.65;
+}
+
+.calendar-topline__text {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: center;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  text-align: center;
 }
 
 .shell__tagline {
@@ -715,8 +725,9 @@ button {
 }
 
 .collapsible-toggle--card .collapsible-toggle__text {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
   gap: 12px;
 }
 
@@ -1377,8 +1388,12 @@ button {
   }
 
   .collapsible-toggle--card .collapsible-toggle__text {
-    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
     gap: 8px;
+  }
+
+  .calendar-topline__text {
+    gap: 0;
   }
 
   .theme-switcher__intro h2,
