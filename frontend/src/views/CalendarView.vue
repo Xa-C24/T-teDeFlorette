@@ -207,14 +207,16 @@ onBeforeUnmount(() => {
         @click="isCalendarOpen = !isCalendarOpen"
       >
         <span class="collapsible-toggle__text">
-          <span class="theme-badge">{{ currentTheme.name }}</span>
-          <span class="calendar-topline__text">
-            <span
-              v-for="(part, index) in spotlightParts"
-              :key="`${index}-${part}`"
-              class="calendar-topline__part"
-            >
-              {{ part }}
+          <span class="calendar-topline">
+            <span class="theme-badge">{{ currentTheme.name }}</span>
+            <span class="calendar-topline__text">
+              <span
+                v-for="(part, index) in spotlightParts"
+                :key="`${index}-${part}`"
+                class="calendar-topline__part"
+              >
+                {{ part }}
+              </span>
             </span>
           </span>
         </span>

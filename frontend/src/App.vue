@@ -62,6 +62,13 @@ async function openTomorrowMemo() {
   });
 }
 
+async function openCatchallMemo() {
+  await router.push({
+    name: "memo-catchall",
+    query: { open: "1", focus: "1" },
+  });
+}
+
 function handleWindowClick(event) {
   if (!event.target.closest(".theme-picker")) {
     isThemeMenuOpen.value = false;
@@ -107,6 +114,7 @@ onBeforeUnmount(() => {
           <button class="ghost-link" type="button" @click="openCalendar">Calendrier</button>
           <button class="ghost-link" type="button" @click="openTodayMemo">Aujourd'hui</button>
           <button class="ghost-link" type="button" @click="openTomorrowMemo">Demain</button>
+          <button class="ghost-link" type="button" @click="openCatchallMemo">Le Fourre-tout</button>
         </div>
         <div class="theme-pulse">
           <span class="theme-pulse__label">Ambiance active</span>

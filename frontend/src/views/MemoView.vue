@@ -18,10 +18,15 @@ const IMPORTANCE_OPTIONS = [
 const props = defineProps({
   date: {
     type: String,
-    required: true,
+    default: "",
+  },
+  memoKind: {
+    type: String,
+    default: "dated",
   },
 });
 
+const CATCHALL_STORAGE_KEY = "tetedeflorette-fourre-tout";
 const route = useRoute();
 const router = useRouter();
 const freeformNotes = ref("");
@@ -38,7 +43,13 @@ const taskInputRef = ref(null);
 let autoSaveDebounceTimer = null;
 let saveFeedbackTimer = null;
 
+const isCatchallMemo = computed(() => props.memoKind === "catchall");
+
 const displayDate = computed(() => {
+  if (isCatchallMemo.value) {
+    return "Le Fourre-tout";
+  }
+
   const label = formatDisplayDate(props.date);
   return label.charAt(0).toUpperCase() + label.slice(1);
 });
@@ -112,8 +123,10 @@ async function loadMemo() {
   saveMessage.value = "";
 
   try {
-    const response = await getMemoByDate(props.date);
-    const parsedMemo = parseStoredMemoContent(response.item?.content || "");
+    const rawContent = isCatchallMemo.value
+      ? window.localStorage.getItem(CATCHALL_STORAGE_KEY) || ""
+      : (await getMemoByDate(props.date)).item?.content || "";
+    const parsedMemo = parseStoredMemoContent(rawContent);
     freeformNotes.value = parsedMemo.notes;
     tasks.value = parsedMemo.tasks.map(normalizeTask);
     newTaskLabel.value = "";
@@ -158,7 +171,13 @@ async function persistMemo(options = {}) {
   errorMessage.value = "";
 
   try {
-    if (!hasMemoContent.value) {
+    if (isCatchallMemo.value) {
+      if (!hasMemoContent.value) {
+        window.localStorage.removeItem(CATCHALL_STORAGE_KEY);
+      } else {
+        window.localStorage.setItem(CATCHALL_STORAGE_KEY, serializeMemoContent());
+      }
+    } else if (!hasMemoContent.value) {
       await deleteMemo(props.date);
     } else {
       await saveMemo({
@@ -172,11 +191,13 @@ async function persistMemo(options = {}) {
     if (returnToCalendar) {
       await router.push({
         name: "calendar",
-        query: {
-          focusDate: props.date,
-          open: "1",
-          stamp: Date.now().toString(),
-        },
+        query: isCatchallMemo.value
+          ? {}
+          : {
+              focusDate: props.date,
+              open: "1",
+              stamp: Date.now().toString(),
+            },
       });
       return;
     }
@@ -257,18 +278,20 @@ function removeTask(taskId) {
 function goBack() {
   router.push({
     name: "calendar",
-    query: {
-      focusDate: props.date,
-      open: "1",
-      stamp: Date.now().toString(),
-    },
+    query: isCatchallMemo.value
+      ? {}
+      : {
+          focusDate: props.date,
+          open: "1",
+          stamp: Date.now().toString(),
+        },
   });
 }
 
-watch(() => props.date, loadMemo);
+watch(() => [props.date, props.memoKind], loadMemo);
 watch([freeformNotes, tasks], queueAutoSave, { deep: true });
 watch(
-  () => [route.query.open, route.query.focus, props.date, loading.value],
+  () => [route.query.open, route.query.focus, props.date, props.memoKind, loading.value],
   () => {
     if (!loading.value) {
       syncOpenStateFromRoute();

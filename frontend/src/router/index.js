@@ -11,6 +11,15 @@ const router = createRouter({
       component: CalendarView,
     },
     {
+      path: "/memo/fourre-tout",
+      name: "memo-catchall",
+      component: MemoView,
+      props: {
+        date: "",
+        memoKind: "catchall",
+      },
+    },
+    {
       path: "/memo/:date",
       name: "memo",
       component: MemoView,

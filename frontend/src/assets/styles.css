@@ -689,6 +689,22 @@ button {
   text-wrap: pretty;
 }
 
+.memo-card .hero-note,
+.memo-card .hint {
+  text-align: center;
+}
+
+.memo-card .hint {
+  margin: 0;
+  font-family: var(--font-accent);
+  font-size: clamp(1.04rem, 1.28vw, 1.24rem);
+  font-style: italic;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: color-mix(in srgb, var(--text-main) 78%, var(--accent-strong));
+  text-wrap: pretty;
+}
+
 .hero-copy {
   margin: 0;
   max-width: 34ch;
@@ -725,9 +741,27 @@ button {
 }
 
 .collapsible-toggle--card .collapsible-toggle__text {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.calendar-topline {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: start;
+  justify-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: center;
+  padding-inline: 28px;
+}
+
+.calendar-topline .theme-badge {
+  justify-self: center;
+}
+
+.calendar-topline__text {
+  justify-items: center;
+  max-width: 28ch;
   gap: 12px;
 }
 
@@ -1388,8 +1422,11 @@ button {
   }
 
   .collapsible-toggle--card .collapsible-toggle__text {
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 8px;
+    width: 100%;
+  }
+
+  .calendar-topline {
+    padding-inline: 18px;
   }
 
   .calendar-topline__text {
