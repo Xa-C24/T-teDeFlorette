@@ -5,7 +5,12 @@ import { deleteMemo, getMemoByDate, saveMemo } from "../services/api";
 import { currentTheme } from "../theme";
 import { formatDisplayDate } from "../utils/date";
 import {
+  CATCHALL_BACKUP_STORAGE_KEY,
+  CATCHALL_BACKUP_TIMESTAMP_KEY,
+  CATCHALL_MEMO_DATE,
+  CATCHALL_STORAGE_KEY,
   hasMemoTasks,
+  hasStoredMemoContent,
   hasMemoText,
   MEMO_V2_PREFIX,
   parseStoredMemoContent,
@@ -26,7 +31,6 @@ const props = defineProps({
   },
 });
 
-const CATCHALL_STORAGE_KEY = "tetedeflorette-fourre-tout";
 const route = useRoute();
 const router = useRouter();
 const freeformNotes = ref("");
@@ -117,15 +121,61 @@ function serializeMemoContent() {
   })}`;
 }
 
+function readCatchallBackupContent() {
+  const backupContent = window.localStorage.getItem(CATCHALL_BACKUP_STORAGE_KEY) || "";
+  const legacyContent = window.localStorage.getItem(CATCHALL_STORAGE_KEY) || "";
+
+  if (hasStoredMemoContent(backupContent)) {
+    return backupContent;
+  }
+
+  if (hasStoredMemoContent(legacyContent)) {
+    return legacyContent;
+  }
+
+  return "";
+}
+
+function persistCatchallBackup(content) {
+  if (!hasStoredMemoContent(content)) {
+    window.localStorage.removeItem(CATCHALL_STORAGE_KEY);
+    window.localStorage.removeItem(CATCHALL_BACKUP_STORAGE_KEY);
+    window.localStorage.removeItem(CATCHALL_BACKUP_TIMESTAMP_KEY);
+    return;
+  }
+
+  window.localStorage.setItem(CATCHALL_STORAGE_KEY, content);
+  window.localStorage.setItem(CATCHALL_BACKUP_STORAGE_KEY, content);
+  window.localStorage.setItem(CATCHALL_BACKUP_TIMESTAMP_KEY, new Date().toISOString());
+}
+
 async function loadMemo() {
   loading.value = true;
   errorMessage.value = "";
   saveMessage.value = "";
 
   try {
-    const rawContent = isCatchallMemo.value
-      ? window.localStorage.getItem(CATCHALL_STORAGE_KEY) || ""
-      : (await getMemoByDate(props.date)).item?.content || "";
+    let rawContent = "";
+
+    if (isCatchallMemo.value) {
+      const serverContent = (await getMemoByDate(CATCHALL_MEMO_DATE)).item?.content || "";
+      const backupContent = readCatchallBackupContent();
+
+      rawContent = serverContent;
+
+      if (!hasStoredMemoContent(serverContent) && hasStoredMemoContent(backupContent)) {
+        rawContent = backupContent;
+        await saveMemo({
+          memoDate: CATCHALL_MEMO_DATE,
+          content: backupContent,
+        });
+      }
+
+      persistCatchallBackup(rawContent);
+    } else {
+      rawContent = (await getMemoByDate(props.date)).item?.content || "";
+    }
+
     const parsedMemo = parseStoredMemoContent(rawContent);
     freeformNotes.value = parsedMemo.notes;
     tasks.value = parsedMemo.tasks.map(normalizeTask);
@@ -173,9 +223,15 @@ async function persistMemo(options = {}) {
   try {
     if (isCatchallMemo.value) {
       if (!hasMemoContent.value) {
-        window.localStorage.removeItem(CATCHALL_STORAGE_KEY);
+        await deleteMemo(CATCHALL_MEMO_DATE);
+        persistCatchallBackup("");
       } else {
-        window.localStorage.setItem(CATCHALL_STORAGE_KEY, serializeMemoContent());
+        const content = serializeMemoContent();
+        await saveMemo({
+          memoDate: CATCHALL_MEMO_DATE,
+          content,
+        });
+        persistCatchallBackup(content);
       }
     } else if (!hasMemoContent.value) {
       await deleteMemo(props.date);

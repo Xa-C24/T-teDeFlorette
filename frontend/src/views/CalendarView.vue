@@ -4,7 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import { getMemos } from "../services/api";
 import { currentTheme } from "../theme";
 import { buildCalendarDays, formatKey, getMonthLabel } from "../utils/date";
-import { hasStoredMemoContent } from "../utils/memo";
+import { hasStoredMemoContent, isCatchallMemoDate } from "../utils/memo";
 
 const route = useRoute();
 const router = useRouter();
@@ -138,7 +138,7 @@ async function loadMemos() {
     const response = await getMemos();
     memoDates.value = new Set(
       response.items
-        .filter((item) => hasStoredMemoContent(item.content))
+        .filter((item) => !isCatchallMemoDate(item.memoDate) && hasStoredMemoContent(item.content))
         .map((item) => item.memoDate)
     );
   } catch (error) {

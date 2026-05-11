@@ -1,4 +1,8 @@
 export const MEMO_V2_PREFIX = "[[TDF_MEMO_V2]]";
+export const CATCHALL_MEMO_DATE = "9999-12-31";
+export const CATCHALL_STORAGE_KEY = "tetedeflorette-fourre-tout";
+export const CATCHALL_BACKUP_STORAGE_KEY = "tetedeflorette-fourre-tout-backup";
+export const CATCHALL_BACKUP_TIMESTAMP_KEY = "tetedeflorette-fourre-tout-backup-at";
 
 export function hasMemoText(value) {
   return typeof value === "string" && value.trim().length > 0;
@@ -36,4 +40,8 @@ export function parseStoredMemoContent(rawContent) {
 export function hasStoredMemoContent(rawContent) {
   const { notes, tasks } = parseStoredMemoContent(rawContent);
   return hasMemoText(notes) || hasMemoTasks(tasks);
+}
+
+export function isCatchallMemoDate(value) {
+  return value === CATCHALL_MEMO_DATE;
 }
