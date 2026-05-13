@@ -121,19 +121,37 @@ function serializeMemoContent() {
   })}`;
 }
 
-function readCatchallBackupContent() {
+function readCatchallBackupSnapshot() {
   const backupContent = window.localStorage.getItem(CATCHALL_BACKUP_STORAGE_KEY) || "";
   const legacyContent = window.localStorage.getItem(CATCHALL_STORAGE_KEY) || "";
+  const backupTimestamp = window.localStorage.getItem(CATCHALL_BACKUP_TIMESTAMP_KEY) || "";
+  const preferredContent = hasStoredMemoContent(backupContent)
+    ? backupContent
+    : hasStoredMemoContent(legacyContent)
+      ? legacyContent
+      : "";
+  const parsedTimestamp = Date.parse(backupTimestamp);
 
-  if (hasStoredMemoContent(backupContent)) {
-    return backupContent;
+  return {
+    content: preferredContent,
+    updatedAt: Number.isNaN(parsedTimestamp) ? null : parsedTimestamp,
+  };
+}
+
+function shouldPreferCatchallBackup(serverContent, serverUpdatedAt, backupSnapshot) {
+  if (!hasStoredMemoContent(backupSnapshot.content)) {
+    return false;
   }
 
-  if (hasStoredMemoContent(legacyContent)) {
-    return legacyContent;
+  if (!hasStoredMemoContent(serverContent)) {
+    return true;
   }
 
-  return "";
+  if (!serverUpdatedAt || !backupSnapshot.updatedAt) {
+    return false;
+  }
+
+  return backupSnapshot.updatedAt > serverUpdatedAt;
 }
 
 function persistCatchallBackup(content) {
@@ -158,16 +176,18 @@ async function loadMemo() {
     let rawContent = "";
 
     if (isCatchallMemo.value) {
-      const serverContent = (await getMemoByDate(CATCHALL_MEMO_DATE)).item?.content || "";
-      const backupContent = readCatchallBackupContent();
+      const serverMemo = (await getMemoByDate(CATCHALL_MEMO_DATE)).item;
+      const serverContent = serverMemo?.content || "";
+      const serverUpdatedAt = serverMemo?.updatedAt ? Date.parse(serverMemo.updatedAt) : null;
+      const backupSnapshot = readCatchallBackupSnapshot();
 
       rawContent = serverContent;
 
-      if (!hasStoredMemoContent(serverContent) && hasStoredMemoContent(backupContent)) {
-        rawContent = backupContent;
+      if (shouldPreferCatchallBackup(serverContent, serverUpdatedAt, backupSnapshot)) {
+        rawContent = backupSnapshot.content;
         await saveMemo({
           memoDate: CATCHALL_MEMO_DATE,
-          content: backupContent,
+          content: backupSnapshot.content,
         });
       }
 
@@ -274,6 +294,10 @@ function queueAutoSave() {
     return;
   }
 
+  if (isCatchallMemo.value) {
+    persistCatchallBackup(serializeMemoContent());
+  }
+
   if (autoSaveDebounceTimer) {
     window.clearTimeout(autoSaveDebounceTimer);
   }
@@ -359,6 +383,10 @@ watch(
 onMounted(loadMemo);
 
 onBeforeUnmount(() => {
+  if (isCatchallMemo.value && hasMemoContent.value) {
+    persistCatchallBackup(serializeMemoContent());
+  }
+
   window.clearTimeout(autoSaveDebounceTimer);
   window.clearTimeout(saveFeedbackTimer);
 });
@@ -401,7 +429,7 @@ onBeforeUnmount(() => {
 
           <div class="memo-section">
             <div class="memo-section__head">
-              <strong>Notes libres</strong>
+              <strong>Notes libres 2.0</strong>
               
             </div>
 
