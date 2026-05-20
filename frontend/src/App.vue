@@ -62,6 +62,18 @@ async function openTomorrowMemo() {
   });
 }
 
+async function openYesterdayMemo() {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayKey = formatKey(yesterday);
+
+  await router.push({
+    name: "memo",
+    params: { date: yesterdayKey },
+    query: { open: "1", focus: "1" },
+  });
+}
+
 async function openCatchallMemo() {
   await router.push({
     name: "memo-catchall",
@@ -112,8 +124,9 @@ onBeforeUnmount(() => {
       <div class="shell__actions">
         <div class="shell__topbar">
           <button class="ghost-link" type="button" @click="openCalendar">Calendrier</button>
+          <button class="ghost-link" type="button" @click="openYesterdayMemo">Hier</button>
           <button class="ghost-link" type="button" @click="openTodayMemo">Aujourd'hui</button>
-          <button class="ghost-link" type="button" @click="openTomorrowMemo">Demain</button>
+          <button class="ghost-link" type="button" @click="openTomorrowMemo">Demain</button> 
           <button class="ghost-link" type="button" @click="openCatchallMemo">Le Fourre-tout</button>
         </div>
         <div class="theme-pulse">
