@@ -249,7 +249,7 @@ npm --prefix frontend install
 
 Lance l'API Express locale sur `http://localhost:3000` :
 
-```bash
+```bash   terminal 1
 npm run dev:api
 ```
 
@@ -265,7 +265,7 @@ npm run dev:frontend
 
 Si Vite echoue a demarrer sur certains environnements Windows avec une erreur de resolution de `vite.config.js`, utiliser ce contournement :
 
-```bash
+```bash terminal 2
 npm --prefix frontend exec vite -- --host 0.0.0.0
 ```
 

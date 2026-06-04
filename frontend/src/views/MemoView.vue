@@ -46,6 +46,7 @@ const memoTextareaRef = ref(null);
 const taskInputRef = ref(null);
 let autoSaveDebounceTimer = null;
 let saveFeedbackTimer = null;
+let loadMemoRequestId = 0;
 
 const isCatchallMemo = computed(() => props.memoKind === "catchall");
 
@@ -167,7 +168,18 @@ function persistCatchallBackup(content) {
   window.localStorage.setItem(CATCHALL_BACKUP_TIMESTAMP_KEY, new Date().toISOString());
 }
 
+function clearPendingAutoSave() {
+  if (!autoSaveDebounceTimer) {
+    return;
+  }
+
+  window.clearTimeout(autoSaveDebounceTimer);
+  autoSaveDebounceTimer = null;
+}
+
 async function loadMemo() {
+  const requestId = ++loadMemoRequestId;
+  clearPendingAutoSave();
   loading.value = true;
   errorMessage.value = "";
   saveMessage.value = "";
@@ -196,15 +208,25 @@ async function loadMemo() {
       rawContent = (await getMemoByDate(props.date)).item?.content || "";
     }
 
+    if (requestId !== loadMemoRequestId) {
+      return;
+    }
+
     const parsedMemo = parseStoredMemoContent(rawContent);
     freeformNotes.value = parsedMemo.notes;
     tasks.value = parsedMemo.tasks.map(normalizeTask);
     newTaskLabel.value = "";
     newTaskImportance.value = "+";
   } catch (error) {
+    if (requestId !== loadMemoRequestId) {
+      return;
+    }
+
     errorMessage.value = error.message;
   } finally {
-    loading.value = false;
+    if (requestId === loadMemoRequestId) {
+      loading.value = false;
+    }
   }
 }
 
@@ -233,7 +255,7 @@ async function syncOpenStateFromRoute() {
 async function persistMemo(options = {}) {
   const { returnToCalendar = false } = options;
 
-  if (saving.value) {
+  if (saving.value || loading.value) {
     return;
   }
 
@@ -299,10 +321,11 @@ function queueAutoSave() {
   }
 
   if (autoSaveDebounceTimer) {
-    window.clearTimeout(autoSaveDebounceTimer);
+    clearPendingAutoSave();
   }
 
   autoSaveDebounceTimer = window.setTimeout(() => {
+    autoSaveDebounceTimer = null;
     persistMemo();
   }, 900);
 }
@@ -387,7 +410,7 @@ onBeforeUnmount(() => {
     persistCatchallBackup(serializeMemoContent());
   }
 
-  window.clearTimeout(autoSaveDebounceTimer);
+  clearPendingAutoSave();
   window.clearTimeout(saveFeedbackTimer);
 });
 </script>
