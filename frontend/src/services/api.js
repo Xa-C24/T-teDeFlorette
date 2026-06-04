@@ -64,6 +64,10 @@ export function getMemoByDate(date) {
   }));
 }
 
+export function getCatchallMemo() {
+  return request("/catchall-memo");
+}
+
 export function saveMemo({ memoDate, content }) {
   return request("/memos", {
     method: "POST",
@@ -71,8 +75,21 @@ export function saveMemo({ memoDate, content }) {
   });
 }
 
+export function saveCatchallMemo({ content }) {
+  return request("/catchall-memo", {
+    method: "POST",
+    body: JSON.stringify({ content }),
+  });
+}
+
 export function deleteMemo(date) {
   return request(`/memos/${date}`, {
+    method: "DELETE",
+  });
+}
+
+export function deleteCatchallMemo() {
+  return request("/catchall-memo", {
     method: "DELETE",
   });
 }

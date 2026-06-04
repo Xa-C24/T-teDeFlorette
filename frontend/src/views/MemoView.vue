@@ -1,13 +1,19 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { deleteMemo, getMemoByDate, saveMemo } from "../services/api";
+import {
+  deleteCatchallMemo,
+  deleteMemo,
+  getCatchallMemo,
+  getMemoByDate,
+  saveCatchallMemo,
+  saveMemo,
+} from "../services/api";
 import { currentTheme } from "../theme";
 import { formatDisplayDate } from "../utils/date";
 import {
   CATCHALL_BACKUP_STORAGE_KEY,
   CATCHALL_BACKUP_TIMESTAMP_KEY,
-  CATCHALL_MEMO_DATE,
   CATCHALL_STORAGE_KEY,
   hasMemoTasks,
   hasStoredMemoContent,
@@ -188,7 +194,7 @@ async function loadMemo() {
     let rawContent = "";
 
     if (isCatchallMemo.value) {
-      const serverMemo = (await getMemoByDate(CATCHALL_MEMO_DATE)).item;
+      const serverMemo = (await getCatchallMemo()).item;
       const serverContent = serverMemo?.content || "";
       const serverUpdatedAt = serverMemo?.updatedAt ? Date.parse(serverMemo.updatedAt) : null;
       const backupSnapshot = readCatchallBackupSnapshot();
@@ -197,8 +203,7 @@ async function loadMemo() {
 
       if (shouldPreferCatchallBackup(serverContent, serverUpdatedAt, backupSnapshot)) {
         rawContent = backupSnapshot.content;
-        await saveMemo({
-          memoDate: CATCHALL_MEMO_DATE,
+        await saveCatchallMemo({
           content: backupSnapshot.content,
         });
       }
@@ -265,12 +270,11 @@ async function persistMemo(options = {}) {
   try {
     if (isCatchallMemo.value) {
       if (!hasMemoContent.value) {
-        await deleteMemo(CATCHALL_MEMO_DATE);
+        await deleteCatchallMemo();
         persistCatchallBackup("");
       } else {
         const content = serializeMemoContent();
-        await saveMemo({
-          memoDate: CATCHALL_MEMO_DATE,
+        await saveCatchallMemo({
           content,
         });
         persistCatchallBackup(content);

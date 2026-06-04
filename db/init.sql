@@ -6,6 +6,14 @@ CREATE TABLE IF NOT EXISTS memos (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS catchall_memos (
+  id SERIAL PRIMARY KEY,
+  slug TEXT UNIQUE NOT NULL,
+  content TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE OR REPLACE FUNCTION set_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -15,8 +23,14 @@ END;
 $$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS memos_set_updated_at ON memos;
+DROP TRIGGER IF EXISTS catchall_memos_set_updated_at ON catchall_memos;
 
 CREATE TRIGGER memos_set_updated_at
 BEFORE UPDATE ON memos
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+CREATE TRIGGER catchall_memos_set_updated_at
+BEFORE UPDATE ON catchall_memos
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();

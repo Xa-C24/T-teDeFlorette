@@ -12,6 +12,8 @@ if (!process.env.DATABASE_URL) {
 
 const { pool, ensureDatabase } = require("../netlify/functions/_lib/db");
 const { isValidDateString } = require("../netlify/functions/_lib/date");
+const CATCHALL_MEMO_DATE = "9999-12-31";
+const DEFAULT_CATCHALL_SLUG = "default";
 
 const app = express();
 const port = Number(process.env.PORT || 8788);
@@ -35,6 +37,56 @@ function normalizeMemo(row) {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
+}
+
+function normalizeCatchallMemo(row) {
+  return {
+    id: row.id,
+    slug: row.slug,
+    content: row.content,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+async function getCatchallMemo() {
+  const result = await pool.query(
+    `SELECT id, slug, content, created_at, updated_at
+     FROM catchall_memos
+     WHERE slug = $1`,
+    [DEFAULT_CATCHALL_SLUG]
+  );
+
+  if (result.rowCount > 0) {
+    return normalizeCatchallMemo(result.rows[0]);
+  }
+
+  const legacyResult = await pool.query(
+    `SELECT content, created_at, updated_at
+     FROM memos
+     WHERE memo_date = $1`,
+    [CATCHALL_MEMO_DATE]
+  );
+
+  if (legacyResult.rowCount === 0) {
+    return null;
+  }
+
+  const migrated = await pool.query(
+    `INSERT INTO catchall_memos (slug, content, created_at, updated_at)
+     VALUES ($1, $2, $3, $4)
+     ON CONFLICT (slug)
+     DO UPDATE SET content = EXCLUDED.content, updated_at = EXCLUDED.updated_at
+     RETURNING id, slug, content, created_at, updated_at`,
+    [
+      DEFAULT_CATCHALL_SLUG,
+      legacyResult.rows[0].content,
+      legacyResult.rows[0].created_at,
+      legacyResult.rows[0].updated_at,
+    ]
+  );
+
+  return normalizeCatchallMemo(migrated.rows[0]);
 }
 
 app.get("/api/health", async (_req, res) => {
@@ -67,6 +119,20 @@ app.get("/api/memos", async (_req, res) => {
     });
   } catch (error) {
     console.error("Get memos failed:", error);
+    res.status(500).json({
+      message: `Internal server error: ${error.message}`,
+    });
+  }
+});
+
+app.get("/api/catchall-memo", async (_req, res) => {
+  try {
+    await ensureDatabase();
+    res.json({
+      item: await getCatchallMemo(),
+    });
+  } catch (error) {
+    console.error("Get catchall memo failed:", error);
     res.status(500).json({
       message: `Internal server error: ${error.message}`,
     });
@@ -134,6 +200,32 @@ app.post("/api/memos", async (req, res) => {
   }
 });
 
+app.post("/api/catchall-memo", async (req, res) => {
+  try {
+    await ensureDatabase();
+    const content = typeof req.body?.content === "string" ? req.body.content : "";
+    const result = await pool.query(
+      `INSERT INTO catchall_memos (slug, content)
+       VALUES ($1, $2)
+       ON CONFLICT (slug)
+       DO UPDATE SET content = EXCLUDED.content, updated_at = CURRENT_TIMESTAMP
+       RETURNING id, slug, content, created_at, updated_at`,
+      [DEFAULT_CATCHALL_SLUG, content]
+    );
+
+    await pool.query("DELETE FROM memos WHERE memo_date = $1", [CATCHALL_MEMO_DATE]);
+
+    res.json({
+      item: normalizeCatchallMemo(result.rows[0]),
+    });
+  } catch (error) {
+    console.error("Save catchall memo failed:", error);
+    res.status(500).json({
+      message: `Internal server error: ${error.message}`,
+    });
+  }
+});
+
 app.delete("/api/memos/:date", async (req, res) => {
   try {
     await ensureDatabase();
@@ -152,6 +244,22 @@ app.delete("/api/memos/:date", async (req, res) => {
     });
   } catch (error) {
     console.error("Delete memo failed:", error);
+    res.status(500).json({
+      message: `Internal server error: ${error.message}`,
+    });
+  }
+});
+
+app.delete("/api/catchall-memo", async (_req, res) => {
+  try {
+    await ensureDatabase();
+    await pool.query("DELETE FROM catchall_memos WHERE slug = $1", [DEFAULT_CATCHALL_SLUG]);
+    await pool.query("DELETE FROM memos WHERE memo_date = $1", [CATCHALL_MEMO_DATE]);
+    res.json({
+      deleted: true,
+    });
+  } catch (error) {
+    console.error("Delete catchall memo failed:", error);
     res.status(500).json({
       message: `Internal server error: ${error.message}`,
     });
