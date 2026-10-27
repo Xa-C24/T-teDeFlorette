@@ -1,10 +1,16 @@
 import { createRouter, createWebHistory } from "vue-router";
 import CalendarView from "../views/CalendarView.vue";
 import MemoView from "../views/MemoView.vue";
+import ShoppingView from "../views/ShoppingView.vue";
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
+    {
+      path: "/keskon-mange",
+      name: "shopping",
+      component: ShoppingView,
+    },
     {
       path: "/",
       name: "calendar",
